@@ -21,6 +21,8 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 
 from utils.general import LOGGER, check_version, colorstr, file_date, git_describe
 
+from models.bifpn import BiFPN_Add2, BiFPN_Add3 , BiFPN_Concat2, BiFPN_Concat3
+
 LOCAL_RANK = int(os.getenv('LOCAL_RANK', -1))  # https://pytorch.org/docs/stable/elastic/run.html
 RANK = int(os.getenv('RANK', -1))
 WORLD_SIZE = int(os.getenv('WORLD_SIZE', 1))
@@ -324,6 +326,16 @@ def smart_optimizer(model, name='Adam', lr=0.001, momentum=0.9, decay=1e-5):
             g[1].append(v.weight)
         elif hasattr(v, 'weight') and isinstance(v.weight, nn.Parameter):  # weight (with decay)
             g[0].append(v.weight)
+        # BiFPN_Concat
+        elif isinstance(v, BiFPN_Add2) and hasattr(v, 'w') and isinstance(v.w, nn.Parameter):
+            g[0].append(v.w)
+        elif isinstance(v, BiFPN_Add3) and hasattr(v, 'w') and isinstance(v.w, nn.Parameter):
+            g[0].append(v.w)
+        elif isinstance(v,BiFPN_Concat2) and hasattr(v, 'w') and isinstance(v.w, nn.Parameter):
+            g[0].append(v.w)
+        elif isinstance(v, BiFPN_Concat3) and hasattr(v, 'w') and isinstance(v.w, nn.Parameter):
+            g[0].append(v.w)
+
 
     if name == 'Adam':
         optimizer = torch.optim.Adam(g[2], lr=lr, betas=(momentum, 0.999))  # adjust beta1 to momentum

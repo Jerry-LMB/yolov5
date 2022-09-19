@@ -22,6 +22,7 @@ if platform.system() != 'Windows':
     ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
 
 from models.common import *
+from models.bifpn import BiFPN_Add2, BiFPN_Add3, BiFPN_Concat3, BiFPN_Concat2
 from models.experimental import *
 from utils.autoanchor import check_anchor_order
 from utils.general import LOGGER, check_version, check_yaml, make_divisible, print_args
@@ -296,7 +297,12 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
                 n = 1
         elif m is nn.BatchNorm2d:
             args = [ch[f]]
-        elif m is Concat:
+        # elif m is Concat:
+        #     c2 = sum(ch[x] for x in f)
+        # 添加bifpn_add结构
+        elif m in [BiFPN_Add2, BiFPN_Add3]:
+            c2 = max([ch[x] for x in f])
+        elif m in [BiFPN_Concat2, BiFPN_Concat3, Concat]:
             c2 = sum(ch[x] for x in f)
         elif m is Detect:
             args.append([ch[x] for x in f])

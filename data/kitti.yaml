@@ -1,0 +1,5 @@
+train: /root/limeibin/training/images/train/  # train images (relative to 'path') 128 images
+val: /root/limeibin/training/images/val/  # val images (relative to 'path') 128 images
+test: /root/limeibin/training/images/test/ # test images (optional)
+nc:  4 # number of classes
+names: ['Car', 'Truck', 'Van', 'Tram']    # class names
